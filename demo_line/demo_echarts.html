@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+<div id="main" style="width: 800px;height: 600px"></div>
+</body>
+<script src="echarts4.0.4.js"></script>
+<script src="jquery.1.11.3.js"></script>
+<script>
+    $(function () {
+        var container = document.getElementById('main');
+        var myChart = echarts.init(container);
+        var option = {
+            title: {
+                text: '堆叠区域图'
+            },
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'cross',
+                    label: {
+                        backgroundColor: '#6a7985'
+                    }
+                }
+            },
+            toolbox: {
+                feature: {
+                    saveAsImage: {}
+                }
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true
+            },
+            xAxis: [
+                {
+                    type: 'category',
+                    boundaryGap: false
+                }
+            ],
+            yAxis: [
+                {
+                    type: 'value'
+                }
+            ]
+        };
+
+        $.ajax({
+            type: 'get',
+            url: 'mock.json',
+            dataType: 'json',
+            success: function (data) {
+
+                option['legend'] = {}
+                option['legend'].data = data.legendData;
+                option['xAxis'][0].data = data.xAxisData;
+                var optionSeries = [];
+                for (var i = 0; i < data.seriesData.length; i++) {
+                    var item = {
+                        name: data.legendData[i],
+                        type: 'line',
+                        stack: '总量',
+                        areaStyle: {normal: {}},
+                        data: data.seriesData[i]
+                    }
+
+                    optionSeries.push(item);
+                }
+                optionSeries[optionSeries.length - 1]['label'] = {
+                    normal: {
+                        show: true,
+                        position: 'top'
+                    }
+                }
+                option.series = optionSeries;
+
+                myChart.setOption(option)
+                
+            },
+            error: function (err) {
+                console.info(err)
+            }
+        })
+    })
+</script>
+</html>
